@@ -21,7 +21,7 @@ const styles = {
 
 const isTouchDevice = !!('ontouchstart' in window || navigator.maxTouchPoints);
 const dndBackend = isTouchDevice ? TouchBackend : HTML5Backend;
-export default class CustomTree extends Component {
+export default class CustomTree extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -59,7 +59,7 @@ export default class CustomTree extends Component {
 
     axios.post(this.props.treeConfig.appUrl, data, { headers: headers })
       .then(response => {
-        this.setState({ initialTreeData: response.data.data, treeData: response.data.data }, () => {
+        this.setState({ initialTreeData: response.data.payload, treeData: response.data.payload }, () => {
           this.refreshTreeData();
         });
       });
@@ -139,6 +139,16 @@ export default class CustomTree extends Component {
         if (item.children !== undefined && item.children !== null) {
           item.children = this.sortFilterNodesAndChildren(item.children);
         }
+
+         if (item.disabled === "false" || item.disabled === "true") {
+          item.disabled = JSON.parse(item.disabled)
+         };
+         if (item.editable === "false" || item.editable === "true") {
+          item.editable = JSON.parse(item.editable)
+         };
+         if (item.expanded === "false" || item.expanded === "true") {
+          item.expanded = JSON.parse(item.expanded)
+         };
         return item;
       });
     }
@@ -207,7 +217,6 @@ export default class CustomTree extends Component {
         getNodeKey: ({ treeIndex }) => treeIndex,
       });
 
-      console.log("tmpnode", tmpNode)
       let nodeObject = {};
       if (tmpNode !== null && tmpNode.node !== undefined) {
         nodeObject = tmpNode.node;
@@ -216,9 +225,6 @@ export default class CustomTree extends Component {
       }
 
       parent = this.removeNodesWithoutMatching(nodeObject, parentPath)
-
-      console.log("nodeoojbect", parent)
-
     };
 
     return parent;
@@ -247,7 +253,7 @@ export default class CustomTree extends Component {
     let { path } = this.state.nodeContextState.contextItem;
 
     // Call api to remove TreeData
-    // Request: this.state.nodeContextState.contextItem, Response: flatTreeData
+    // Request: this.state.nodeContextState.contextItem, Response: TreeData
 
     this.setState({
       treeData: removeNodeAtPath({
@@ -286,7 +292,7 @@ export default class CustomTree extends Component {
       let newRowInfo = this.state.nodeItem;
 
       // Call api to update node
-      // Request: newRowInfo, Response: flatTreeData
+      // Request: newRowInfo, Response: TreeData
       let newTree = changeNodeAtPath({
         treeData: this.state.treeData,
         path: originalRowInfo.path,
@@ -322,7 +328,7 @@ export default class CustomTree extends Component {
       });
 
       // Call api to add new node
-      // Request: newTree.treeData, Response: flatTreeData to update initialTreeData
+      // Request: newTree.treeData, Response: TreeData to update initialTreeData
       this.setState({ treeData: newTree.treeData })
     }
 
@@ -484,7 +490,7 @@ export default class CustomTree extends Component {
     lowerSiblingCounts: [],
     title: (
       <div className='justify-content-between' style={{ width: '100%' }} >
-        <i className={`fa ${rowInfo.node.icon} fa-md mr-2`} style={{ color: rowInfo.node.disabled ? this.state.disabledColor : this.state.iconColor }}></i>
+        <i className={`fa fa-${rowInfo.node.icon} fa-md mr-2`} style={{ color: rowInfo.node.disabled ? this.state.disabledColor : this.state.iconColor }}></i>
         <span style={{ color: rowInfo.node.disabled ? this.state.disabledColor : this.state.titleColor }}>
           {rowInfo.node.title}
         </span>
@@ -498,6 +504,17 @@ export default class CustomTree extends Component {
       </>
     ]
   })
+
+  convertTree = node => {
+    if (!node.child) {
+      return node;
+    }
+  
+    const children = node.child
+      .map(child => this.convertTree(child));
+    delete node.child; // optional
+    return Object.assign({}, node, { children });
+  };
 
 
   render() {

@@ -9,12 +9,12 @@ const treeConfig = {
   infoColor: "#23282c",
   disabledColor: "#a64dff",
   settings: {
-    maxDepth: 10,
+    maxDepth: 20,
     showDisabled: true,
     caseSensitive: true,
     showOnlyMatches: false,
   },
-  appUrl: "http://localhost:3000/users"
+  appUrl: "https://apitest.drinna.net/api/v1/Users/users"
 }
 
 class User extends Component {
