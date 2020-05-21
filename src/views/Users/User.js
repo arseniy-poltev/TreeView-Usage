@@ -14,7 +14,7 @@ const treeConfig = {
     caseSensitive: true,
     showOnlyMatches: false,
   },
-  appUrl: "https://apitest.drinna.net/api/v1/Users/users"
+  appUrl: "http://localhost:3000/users"
 }
 
 class User extends Component {
