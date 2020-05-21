@@ -4,10 +4,9 @@ import { DndProvider } from 'react-dnd';
 import FileExplorerTheme from 'react-sortable-tree-theme-file-explorer';
 import HTML5Backend from 'react-dnd-html5-backend';
 import TouchBackend from 'react-dnd-touch-backend';
-import ZIndex from 'react-z-index'
 import axios from 'axios';
-// import { SortableTreeWithoutDndContext as SortableTree } from "./src/react-sortable-tree";
-import SortableTree from "./src/react-sortable-tree";
+import { SortableTreeWithoutDndContext as SortableTree } from "./src/react-sortable-tree";
+// import SortableTree  from "./src/react-sortable-tree";
 import { removeNodeAtPath, getNodeAtPath, addNodeUnderParent, changeNodeAtPath, toggleExpandedForAll, getTreeFromFlatData } from './utils/tree-data-utils';
 import "react-sortable-tree/style.css";
 import ContextMenu from './Components/ContextMenu'
@@ -20,8 +19,6 @@ const styles = {
     paddingTop: '10px'
   }
 }
-ZIndex.setVars({ Overlay: 9999 })
-
 
 const isTouchDevice = !!('ontouchstart' in window || navigator.maxTouchPoints);
 const dndBackend = isTouchDevice ? TouchBackend : HTML5Backend;
@@ -79,13 +76,13 @@ export default class CustomTree extends React.Component {
 
   loadTreeState = (flatData) => {
     let treeState = this.state.treeState;
-    if (treeState) {
+    if(treeState) {
       treeState = JSON.parse(treeState);
 
-      if (treeState.length > 0) {
+      if(treeState.length > 0) {
         flatData.map(item => {
           treeState.map(sItem => {
-            if (item.id === sItem.id) {
+            if(item.id === sItem.id) {
               item.expanded = sItem.expanded;
             }
           })
@@ -155,7 +152,7 @@ export default class CustomTree extends React.Component {
 
     if (e.target.name === 'caseSensitive') {
       // this.setState({ searchString: '' })
-      this.setState({ searchString: e.target.checked ? this.state.initialSearchString : this.state.initialSearchString.toUpperCase() })
+      this.setState({searchString: e.target.checked ? this.state.initialSearchString : this.state.initialSearchString.toUpperCase()})
     }
     // this.setState({ treeData: this.state.initialTreeData })
 
@@ -522,10 +519,10 @@ export default class CustomTree extends React.Component {
 
   getNodeColor(rowInfo, itemType) {
     let itemColor = "";
-    if (rowInfo.node.disabled) {
+    if(rowInfo.node.disabled) {
       itemColor = this.state.disabledColor;
     } else {
-      if (rowInfo.node[itemType] !== null & rowInfo.node[itemType] !== undefined) {
+      if(rowInfo.node[itemType] !== null & rowInfo.node[itemType] !== undefined) {
         itemColor = rowInfo.node[itemType];
       } else {
         itemColor = this.state[itemType];
@@ -586,7 +583,7 @@ export default class CustomTree extends React.Component {
       tmpState.id = item.id;
       tmpState.expanded = item.expanded
       tStateList.push(tmpState);
-      if (item.children) {
+      if(item.children) {
         this.fetchTreeState(item.children, tStateList)
       }
     })
@@ -598,7 +595,7 @@ export default class CustomTree extends React.Component {
     treeState = this.fetchTreeState(this.state.treeData, []);
     let saveString = JSON.stringify(treeState);
     localStorage.setItem("t_setting", saveString);
-    this.setState({ treeState: saveString });
+    this.setState({treeState: saveString});
 
     console.log(this.treeEditModal)
   }
@@ -615,7 +612,7 @@ export default class CustomTree extends React.Component {
       treeState
     } = this.state;
 
-    var modalStyles = { overlay: { zIndex: 9999 } };
+    var modalStyles = {overlay: {zIndex: 9999}};
     return (
       <CCard
         custom accentColor="primary"
@@ -654,31 +651,30 @@ export default class CustomTree extends React.Component {
           }
           {this.state.initialTreeData !== null &&
             <div className="tree-content text-white" style={styles.treeContent}>
-              {/* <DndProvider backend={dndBackend}> */}
-              <SortableTree
-                theme={FileExplorerTheme}
-                treeData={treeData}
-                onChange={this.handleTreeOnChange}
-                onMoveNode={this.handleOnMobeNode}
-                maxDepth={this.state.maxDepth}
-                searchMethod={this.customSearchMethod}
-                searchQuery={searchString}
-                searchFocusOffset={searchFocusIndex}
-                canDrag={this.checkCanDrag}
-                canDrop={({ nextParent }) => !nextParent || !nextParent.noChildren}
-                searchFinishCallback={this.handleSearchFinishCallback}
-                generateNodeProps={this.generateCustomNodeProps}
-                onlyExpandSearchedNodes={true}
-              />
-              <ContextMenu
-                nodeContextState={this.state.nodeContextState}
-                editNode={this.editNode}
-                addNode={this.addNode}
-                removeNode={this.removeNode}
-                nodeItem={this.state.nodeContextState.contextItem}
-                clearContextState={this.clearContextState}
-              />
-              <ZIndex top>
+              <DndProvider backend={dndBackend}>
+                <SortableTree
+                  theme={FileExplorerTheme}
+                  treeData={treeData}
+                  onChange={this.handleTreeOnChange}
+                  onMoveNode={this.handleOnMobeNode}
+                  maxDepth={this.state.maxDepth}
+                  searchMethod={this.customSearchMethod}
+                  searchQuery={searchString}
+                  searchFocusOffset={searchFocusIndex}
+                  canDrag={this.checkCanDrag}
+                  canDrop={({ nextParent }) => !nextParent || !nextParent.noChildren}
+                  searchFinishCallback={this.handleSearchFinishCallback}
+                  generateNodeProps={this.generateCustomNodeProps}
+                  onlyExpandSearchedNodes={true}
+                />
+                <ContextMenu
+                  nodeContextState={this.state.nodeContextState}
+                  editNode={this.editNode}
+                  addNode={this.addNode}
+                  removeNode={this.removeNode}
+                  nodeItem={this.state.nodeContextState.contextItem}
+                  clearContextState={this.clearContextState}
+                />
                 <CModal
                   show={this.state.nodeContextState.nodeModalToggle}
                   toggle={this.toggleModal}
@@ -701,9 +697,7 @@ export default class CustomTree extends React.Component {
                     <CButton color="secondary" onClick={this.toggleModal}>Cancel</CButton>
                   </CModalFooter>
                 </CModal>
-              </ZIndex>
-
-              {/* </DndProvider> */}
+              </DndProvider>
             </div>
           }
         </CCardBody>
