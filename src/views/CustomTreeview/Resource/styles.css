@@ -1,0 +1,15 @@
+.react-draggable {
+    /* z-index: 1040 !important; */
+}
+
+.resize-triggers {
+    z-index: 9999 !important;
+}
+
+/* .tree-content {
+    background: red;
+} */
+
+.rst__tree {
+    background-color: #ffffff;
+}

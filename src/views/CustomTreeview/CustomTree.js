@@ -11,6 +11,7 @@ import { removeNodeAtPath, getNodeAtPath, addNodeUnderParent, changeNodeAtPath, 
 import "react-sortable-tree/style.css";
 import ContextMenu from './Components/ContextMenu'
 import OptionPanel from './Components/OptionPanel'
+import './Resource/styles.css'
 import 'font-awesome/css/font-awesome.min.css';
 
 const styles = {
@@ -61,10 +62,11 @@ export default class CustomTree extends React.Component {
     }
     const data = {};
     this.setState({ isLoading: true });
-    localStorage.removeItem("t_setting");
+    // localStorage.removeItem("t_setting");
     axios.post(this.props.treeConfig.appUrl, data, { headers: headers })
       .then(response => {
-        const initData = this.loadTreeState(response.data)
+        const initData = this.loadTreeState(response.data);
+        localStorage.setItem("t_setting", JSON.stringify([]));
         let treeData = this.makeTreeData(initData);
         this.setState({ initialTreeData: treeData, treeData: treeData, isLoading: false }, () => {
           this.refreshTreeData();
@@ -72,16 +74,28 @@ export default class CustomTree extends React.Component {
       });
   }
 
+  componentDidUpdate() {
+    if (this.state.treeData.length && this.state.treeData.length > 0) {
+      if (localStorage.getItem("t_setting") !== null) {
+        let treeState = [];
+        treeState = this.fetchTreeState(this.state.treeData, []);
+        let saveString = JSON.stringify(treeState);
+        localStorage.setItem("t_setting", saveString);
+      }
+    }
+  }
+
   loadTreeState = (flatData) => {
     let treeState = this.state.treeState;
-    if(treeState) {
+    if (treeState) {
       treeState = JSON.parse(treeState);
 
-      if(treeState.length > 0) {
+      if (treeState.length > 0) {
         flatData.map(item => {
           treeState.map(sItem => {
-            if(item.id === sItem.id) {
+            if (item.id === sItem.id) {
               item.expanded = sItem.expanded;
+              item.checked = sItem.checked ? sItem.checked : null;
             }
           })
 
@@ -150,7 +164,7 @@ export default class CustomTree extends React.Component {
 
     if (e.target.name === 'caseSensitive') {
       // this.setState({ searchString: '' })
-      this.setState({searchString: e.target.checked ? this.state.initialSearchString : this.state.initialSearchString.toUpperCase()})
+      this.setState({ searchString: e.target.checked ? this.state.initialSearchString : this.state.initialSearchString.toUpperCase() })
     }
     // this.setState({ treeData: this.state.initialTreeData })
 
@@ -517,10 +531,10 @@ export default class CustomTree extends React.Component {
 
   getNodeColor(rowInfo, itemType) {
     let itemColor = "";
-    if(rowInfo.node.disabled) {
+    if (rowInfo.node.disabled) {
       itemColor = this.state.disabledColor;
     } else {
-      if(rowInfo.node[itemType] !== null & rowInfo.node[itemType] !== undefined) {
+      if (rowInfo.node[itemType] !== null & rowInfo.node[itemType] !== undefined) {
         itemColor = rowInfo.node[itemType];
       } else {
         itemColor = this.state[itemType];
@@ -548,7 +562,10 @@ export default class CustomTree extends React.Component {
     lowerSiblingCounts: [],
     title: (
       <div className='justify-content-between' style={{ width: '100%' }} >
-        <i className={`fa fa-${rowInfo.node.icon} fa-md mr-2`} style={{ color: this.getNodeColor(rowInfo, "iconColor") }}></i>
+        <CFormGroup check className="checkbox">
+          <CInput className="form-check-input" type="checkbox" onChange={e => this.handleNodeCheckbox(rowInfo, e)} defaultChecked={rowInfo.node.checked} />
+        </CFormGroup>
+        <i className={`fa fa-${rowInfo.node.icon} fa-md ml-3 mr-1`} style={{ color: this.getNodeColor(rowInfo, "iconColor") }}></i>
         <span style={{ color: this.getNodeColor(rowInfo, "titleColor") }}>
           {rowInfo.node.title}
         </span>
@@ -562,6 +579,23 @@ export default class CustomTree extends React.Component {
       </>
     ]
   })
+
+  handleNodeCheckbox = (rowInfo, e) => {
+    let newRowInfo = rowInfo.node;
+    newRowInfo.checked = e.target.checked;
+
+    // Call api to update node
+    // Request: newRowInfo, Response: TreeData
+    let newTree = changeNodeAtPath({
+      treeData: this.state.treeData,
+      path: rowInfo.path,
+      newNode: newRowInfo,
+      getNodeKey: ({ treeIndex }) => treeIndex,
+    });
+
+    this.setState({ treeData: newTree }, () => ({
+    }));
+  }
 
   convertTree = node => {
     if (!node.child) {
@@ -579,9 +613,10 @@ export default class CustomTree extends React.Component {
     tData.map(item => {
       let tmpState = {};
       tmpState.id = item.id;
-      tmpState.expanded = item.expanded
+      tmpState.expanded = item.expanded;
+      tmpState.checked = item.checked ? item.checked : null;
       tStateList.push(tmpState);
-      if(item.children) {
+      if (item.children) {
         this.fetchTreeState(item.children, tStateList)
       }
     })
@@ -593,9 +628,7 @@ export default class CustomTree extends React.Component {
     treeState = this.fetchTreeState(this.state.treeData, []);
     let saveString = JSON.stringify(treeState);
     localStorage.setItem("t_setting", saveString);
-    this.setState({treeState: saveString});
-
-    console.log(this.treeEditModal)
+    this.setState({ treeState: saveString });
   }
 
   render() {
@@ -610,7 +643,7 @@ export default class CustomTree extends React.Component {
       treeState
     } = this.state;
 
-    var modalStyles = {overlay: {zIndex: 9999}};
+    var modalStyles = { overlay: { zIndex: 9999 } };
     return (
       <CCard
         custom accentColor="primary"

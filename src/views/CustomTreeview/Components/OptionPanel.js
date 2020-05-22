@@ -23,7 +23,7 @@ export default class OptionPanel extends Component {
                 zIndex: 1030,
                 marginTop: 2
             },
-            saveStateToggle: false
+            saveStateToggle: true
         }
 
         this.toggleOption = this.toggleOption.bind(this)
@@ -78,7 +78,7 @@ export default class OptionPanel extends Component {
 
     SaveRemoveState = () => {
         if(this.state.saveStateToggle) {
-            localStorage.removeItem("t_setting")
+            localStorage.removeItem("t_setting");
         } else {
             this.props.handleSaveState("save");
         }
@@ -93,7 +93,7 @@ export default class OptionPanel extends Component {
                 scale={1}
                 onStart={this.handleDragEvent}
             >
-                <div style={{ zIndex: 9999 }}>
+                <div>
                     <CButtonGroup className="justify-content-space-between" style={{width: "100%"}}>
                         <CButton color="primary" className="btn-brand btn-sm handle" style={{ cursor: "move" }} ><CIcon name="cil-move" /></CButton>
                         <CButton
