@@ -643,13 +643,13 @@ export default class CustomTree extends React.Component {
       treeState
     } = this.state;
 
-    var modalStyles = { overlay: { zIndex: 9999 } };
     return (
       <CCard
         custom accentColor="primary"
         headerSlot="Card outline primary"
         className="text-white"
         borderColor="primary"
+        style={{zIndex: 0, position: "relative"}}
       >
         <CCardBody onKeyUp={this.handleKeyEvent} tabIndex="0">
           <OptionPanel
@@ -710,7 +710,6 @@ export default class CustomTree extends React.Component {
                   show={this.state.nodeContextState.nodeModalToggle}
                   toggle={this.toggleModal}
                   className={'modal-sm modal-primary custom-modal'}
-                  style={modalStyles}
                 >
                   <CModalHeader
                     toggle={this.toggleModal}>
