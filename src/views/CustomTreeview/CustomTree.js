@@ -59,6 +59,7 @@ export default class CustomTree extends React.Component {
   UNSAFE_componentWillMount() {
     const headers = {
       'Content-Type': 'application/json',
+      'Cache-Control': 'no-cache, no-store'
     }
     const data = {};
     this.setState({ isLoading: true });
