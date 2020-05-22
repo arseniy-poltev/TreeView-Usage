@@ -62,11 +62,9 @@ export default class OptionPanel extends Component {
 
     handleDragEvent = (event, ui) => {
         if(ui.lastX === this.state.position.mouseX && ui.lastY === this.state.position.mouseY) {
-            console.log("click")
             this.setState({ optionPanelState: !this.state.optionPanelState });
            
         } else {
-            console.log("drag")
             let position = {
                 mouseX: ui.lastX,
                 mouseY: ui.lastY
