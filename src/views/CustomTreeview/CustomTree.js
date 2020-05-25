@@ -12,6 +12,8 @@ import ContextMenu from './Components/ContextMenu'
 import OptionPanel from './Components/OptionPanel'
 import './Resource/styles.css'
 import 'font-awesome/css/font-awesome.min.css';
+import Draggable from 'react-draggable';
+import { match } from "assert";
 
 const styles = {
   treeContent: {
@@ -63,6 +65,7 @@ export default class CustomTree extends React.Component {
 
     const months = ['Aaaa zzz', 'Aaaaaa bbb', 'Bbbbbb bbb', 'Bbbb ccc'];
     months.sort();
+    console.log(months);
 
     const data = {};
     this.setState({ isLoading: true });
@@ -166,7 +169,19 @@ export default class CustomTree extends React.Component {
     }
 
     if (e.target.name === 'caseSensitive') {
-      this.setState({ searchString: e.target.checked ? this.state.initialSearchString : this.state.initialSearchString.toUpperCase() })
+      // this.setState({ searchString: e.target.checked ? this.state.initialSearchString : this.state.initialSearchString.toUpperCase() }, () => {
+      //   console.log('this.state.searchString', this.state.searchString);
+      // })
+
+      if (!e.target.checked) {
+        if (this.state.initialSearchString.toUpperCase() === this.state.initialSearchString) {
+          this.setState({ searchString: this.state.initialSearchString.toLocaleLowerCase() })
+        } else {
+          this.setState({ searchString: this.state.initialSearchString.toUpperCase() })
+        }
+      } else {
+        this.setState({ searchString: this.state.initialSearchString });
+      }
     }
 
     let checkState = {};
@@ -605,7 +620,7 @@ export default class CustomTree extends React.Component {
 
     const children = node.child
       .map(child => this.convertTree(child));
-    delete node.child; 
+    delete node.child;
     return Object.assign({}, node, { children });
   };
 
@@ -648,21 +663,26 @@ export default class CustomTree extends React.Component {
         headerSlot="Card outline primary"
         className="text-white"
         borderColor="primary"
-        style={{zIndex: 0, position: "relative"}}
+        style={{ zIndex: 0, position: "relative" }}
       >
         <CCardBody onKeyUp={this.handleKeyEvent} tabIndex="0">
-          <OptionPanel
-            handleSearch={this.handleSearchOnChange}
-            toggleNodeExpansion={this.toggleNodeExpansion}
-            expandCollapseOption={this.state.toggleNodeExpansion}
-            bindOptionCheckbox={this.bindOptionCheckbox}
-            handleExportJson={this.handleExportJson}
-            handleSaveState={this.handleSaveState}
-            searchString={initialSearchString}
-            showDisabled={showDisabled}
-            caseSensitive={caseSensitive}
-            showOnlyMatches={showOnlyMatches}
-          />
+          <Draggable
+            allowAnyClick={false}
+            handle=".handle"
+          >
+            <OptionPanel
+              handleSearch={this.handleSearchOnChange}
+              toggleNodeExpansion={this.toggleNodeExpansion}
+              expandCollapseOption={this.state.toggleNodeExpansion}
+              bindOptionCheckbox={this.bindOptionCheckbox}
+              handleExportJson={this.handleExportJson}
+              handleSaveState={this.handleSaveState}
+              searchString={initialSearchString}
+              showDisabled={showDisabled}
+              caseSensitive={caseSensitive}
+              showOnlyMatches={showOnlyMatches}
+            />
+          </Draggable>
           {this.state.isLoading &&
             <div className="sk-circle">
               <div className="sk-circle1 sk-child"></div>
