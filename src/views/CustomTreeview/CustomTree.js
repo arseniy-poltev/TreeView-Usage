@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React from "react";
 import { CInput, CFormGroup, CButton, CLabel, CModal, CModalHeader, CModalBody, CModalFooter, CCard, CCardBody, CSpinner } from '@coreui/react';
 import { DndProvider } from 'react-dnd';
 import FileExplorerTheme from 'react-sortable-tree-theme-file-explorer';
@@ -60,6 +60,10 @@ export default class CustomTree extends React.Component {
       'Content-Type': 'application/json',
       'Cache-Control': 'no-cache, no-store'
     }
+
+    const months = ['Aaaa zzz', 'Aaaaaa bbb', 'Bbbbbb bbb', 'Bbbb ccc'];
+    months.sort();
+
     const data = {};
     this.setState({ isLoading: true });
     // localStorage.removeItem("t_setting");
@@ -95,7 +99,6 @@ export default class CustomTree extends React.Component {
           treeState.map(sItem => {
             if (item.id === sItem.id) {
               item.expanded = sItem.expanded;
-              item.checked = sItem.checked ? sItem.checked : null;
             }
           })
 
@@ -607,12 +610,10 @@ export default class CustomTree extends React.Component {
   };
 
   fetchTreeState = (tData, tStateList) => {
-
     tData.map(item => {
       let tmpState = {};
       tmpState.id = item.id;
       tmpState.expanded = item.expanded;
-      tmpState.checked = item.checked ? item.checked : null;
       tStateList.push(tmpState);
       if (item.children) {
         this.fetchTreeState(item.children, tStateList)
